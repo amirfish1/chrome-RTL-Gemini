@@ -28,19 +28,34 @@ function processCanvas() {
 
   const rules = [];
 
+  const RTL_RULE = 'direction: rtl !important; text-align: right !important; unicode-bidi: plaintext !important;';
+
   editors.forEach((editor) => {
     const children = editor.children;
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
       const tag = child.tagName.toLowerCase();
-      // Only target known block-level text elements
+      const nth = i + 1; // nth-child is 1-based
+      const prefix = `immersive-editor .ProseMirror > ${tag}:nth-child(${nth})`;
+
+      // Handle list containers: if any li inside has Hebrew, RTL the whole list and its items
+      if (tag === 'ul' || tag === 'ol') {
+        const items = child.querySelectorAll('li');
+        let listHasHebrew = false;
+        items.forEach((li) => {
+          if (isHebrew(li.textContent)) listHasHebrew = true;
+        });
+        if (listHasHebrew) {
+          rules.push(`${prefix} { ${RTL_RULE} }`);
+          rules.push(`${prefix} li { ${RTL_RULE} }`);
+        }
+        continue;
+      }
+
       if (!child.matches(BLOCK_TAGS)) continue;
 
       if (isHebrew(child.textContent)) {
-        // nth-child is 1-based
-        rules.push(
-          `immersive-editor .ProseMirror > ${tag}:nth-child(${i + 1}) { direction: rtl !important; text-align: right !important; unicode-bidi: plaintext !important; }`
-        );
+        rules.push(`${prefix} { ${RTL_RULE} }`);
       }
     }
   });
