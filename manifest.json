@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Canvas RTL for Hebrew",
+  "version": "1.0",
+  "description": "Automatically sets paragraph direction to RTL for Hebrew text in Gemini canvas mode.",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
